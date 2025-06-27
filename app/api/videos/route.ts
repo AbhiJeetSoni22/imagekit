@@ -1,7 +1,9 @@
+'use server'
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import Video, { IVideo } from "@/models/Video";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -14,6 +16,7 @@ export async function GET(){
       if(!videos || videos.length === 0){
         return NextResponse.json([],{status:200})
       }
+     
       return NextResponse.json(videos)
     } catch (error) {
       console.log(error)
@@ -55,6 +58,7 @@ export async function POST(request : NextRequest){
       }
 
       const newVideo = await Video.create(videoData)
+       revalidatePath('/')
       return NextResponse.json(newVideo)
     } catch (error) {
         console.log(error)
